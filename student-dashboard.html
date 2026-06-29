@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Dashboard | LEE Tech Leap Solutions</title>
+<meta name="description" content="Track your internship, attendance, tasks, and certificates with LEE Tech Leap Solutions.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav">
+    <a href="index.html" class="logo">
+      <img src="assets/logo.png" alt="LEE Tech Leap Solutions Logo">
+      <span class="logo-text">LEE Tech Leap Solutions<small>Smart Solutions. Stronger Futures.</small></span>
+    </a>
+    <nav class="links">
+      <a href="index.html" class="">Home</a>
+      <div class="has-dropdown">
+        <a href="services.html" class="">Services</a>
+        <div class="dropdown">
+          <a href="seo.html"><span class="dot"></span>SEO</a>
+          <a href="social-media-marketing.html"><span class="dot"></span>Social Media Marketing</a>
+          <a href="email-marketing.html"><span class="dot"></span>Email Marketing</a>
+          <a href="content-marketing.html"><span class="dot"></span>Content Marketing</a>
+          <a href="analytics.html"><span class="dot"></span>Analytics &amp; Reporting</a>
+        </div>
+      </div>
+      <a href="about.html" class="">About</a>
+      <a href="contact.html" class="">Contact</a>
+      <a href="internship-register.html" class="active">Internships</a>
+    </nav>
+    <a href="contact.html" class="btn nav-cta">Get a Proposal</a>
+    <button class="mobile-toggle">&#9776; Menu</button>
+  </div>
+  <div class="mobile-menu">
+    <a href="index.html">Home</a>
+    <a href="services.html">Services</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <a href="internship-register.html">Internships</a>
+  </div>
+</header>
+
+<div id="logged-out-state" style="display:none;">
+  <section class="page-head">
+    <div class="wrap center">
+      <span class="eyebrow">Student Dashboard</span>
+      <h1>You're not logged in yet.</h1>
+      <p class="lede" style="margin: 0 auto;">Log in or create a student account to view your internship, attendance, tasks, and certificates.</p>
+      <div class="hero-actions" style="justify-content: center; margin-top: 28px;">
+        <a href="internship-register.html" class="btn btn-primary">Log In / Register <span class="btn-arrow">&rarr;</span></a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div id="dashboard-state" style="display:none;">
+
+  <section class="page-head" style="padding-bottom: 0; border-bottom: none;">
+    <div class="wrap">
+      <div class="breadcrumb"><a href="index.html">Home</a> / Student Dashboard</div>
+      <span class="eyebrow">Student Dashboard</span>
+      <h1 id="welcome-heading">Welcome back.</h1>
+    </div>
+  </section>
+
+  <section style="padding-top: 24px;">
+    <div class="wrap">
+      <div class="dash-shell bordered" style="border: 1px solid var(--line); border-radius: 8px; overflow: hidden;">
+
+        <aside class="dash-sidebar">
+          <div class="student-id-card">
+            <div class="avatar" id="avatar-initials">--</div>
+            <div class="name" id="sidebar-name">Student Name</div>
+            <div class="dept" id="sidebar-dept">Department</div>
+          </div>
+          <ul class="dash-nav">
+            <li><button class="active" data-section="sec-overview">Overview</button></li>
+            <li><button data-section="sec-internships">Internships</button></li>
+            <li><button data-section="sec-attendance">Attendance</button></li>
+            <li><button data-section="sec-tasks">Tasks</button></li>
+            <li><button data-section="sec-certificates">Certificates</button></li>
+            <li><button class="logout-btn" id="logout-btn">Log Out</button></li>
+          </ul>
+        </aside>
+
+        <main class="dash-main">
+
+          <div id="dash-loading" class="loading-row"><span class="spinner"></span> Loading your dashboard...</div>
+
+          <div id="dash-content" style="display:none;">
+
+            <div id="sec-overview" class="dash-section active">
+              <div class="section-toolbar">
+                <h2>Overview</h2>
+              </div>
+              <div class="dash-stats">
+                <div class="dash-stat-card">
+                  <div class="stat-num" id="stat-active">0</div>
+                  <div class="stat-lbl">Active internships</div>
+                </div>
+                <div class="dash-stat-card">
+                  <div class="stat-num" id="stat-attendance">0%</div>
+                  <div class="stat-lbl">Attendance rate</div>
+                </div>
+                <div class="dash-stat-card">
+                  <div class="stat-num" id="stat-tasks-done">0</div>
+                  <div class="stat-lbl">Tasks completed</div>
+                </div>
+                <div class="dash-stat-card">
+                  <div class="stat-num" id="stat-certs">0</div>
+                  <div class="stat-lbl">Certificates earned</div>
+                </div>
+              </div>
+
+              <h3 style="margin-bottom: 14px;">Current internship</h3>
+              <div id="overview-internship"></div>
+
+              <h3 style="margin: 28px 0 14px;">Upcoming tasks</h3>
+              <div id="overview-tasks"></div>
+            </div>
+
+            <div id="sec-internships" class="dash-section">
+              <div class="section-toolbar"><h2>Internships</h2></div>
+              <div class="dash-table-wrap">
+                <table class="dash-table">
+                  <thead>
+                    <tr><th>Company</th><th>Role</th><th>Mentor</th><th>Start Date</th><th>Status</th></tr>
+                  </thead>
+                  <tbody id="internships-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div id="sec-attendance" class="dash-section">
+              <div class="section-toolbar"><h2>Attendance</h2></div>
+              <div class="dash-table-wrap">
+                <table class="dash-table">
+                  <thead>
+                    <tr><th>Date</th><th>Check In</th><th>Check Out</th><th>Status</th></tr>
+                  </thead>
+                  <tbody id="attendance-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div id="sec-tasks" class="dash-section">
+              <div class="section-toolbar"><h2>Tasks</h2></div>
+              <div class="dash-table-wrap">
+                <table class="dash-table">
+                  <thead>
+                    <tr><th>Task</th><th>Due Date</th><th>Status</th></tr>
+                  </thead>
+                  <tbody id="tasks-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div id="sec-certificates" class="dash-section">
+              <div class="section-toolbar"><h2>Certificates</h2></div>
+              <div id="certificates-list"></div>
+            </div>
+
+          </div>
+        </main>
+      </div>
+    </div>
+  </section>
+
+  <div style="height: 60px;"></div>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <a href="index.html" class="logo">
+          <img src="assets/logo.png" alt="LEE Tech Leap Solutions">
+          <span class="logo-text">LEE Tech Leap Solutions<small>Smart Solutions. Stronger Futures.</small></span>
+        </a>
+        <p class="about">LEE Tech Leap Solutions — a results-driven digital marketing company in Chennai helping businesses establish a strong online presence and achieve sustainable growth.</p>
+        <div class="footer-badge">Chennai, Tamil Nadu</div>
+      </div>
+      <div>
+        <h4>Services</h4>
+        <ul>
+          <li><a href="seo.html">SEO</a></li>
+          <li><a href="social-media-marketing.html">Social Media Marketing</a></li>
+          <li><a href="email-marketing.html">Email Marketing</a></li>
+          <li><a href="content-marketing.html">Content Marketing</a></li>
+          <li><a href="analytics.html">Analytics &amp; Reporting</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="services.html">All Services</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="internship-register.html">Internship Program</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact Us</h4>
+        <ul>
+          <li><a href="mailto:leetechleap@gmail.com">leetechleap@gmail.com</a></li>
+          <li><a href="tel:+919962002214">+91 99620 02214</a></li>
+          <li style="color:rgba(255,255,255,.45);font-size:.82rem;padding-top:4px;line-height:1.6;">431, Poonamallee High Rd,<br>Aminjikarai, Chennai 600030</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 LEE Tech Leap Solutions. All rights reserved.</span>
+      <div class="legal-links"><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></div>
+    </div>
+  </div>
+</footer>
+
+<button class="to-top" aria-label="Back to top">↑</button>
+<script src="assets/app.js"></script>
+<script src="assets/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async function () {
+  var student = Auth.get();
+
+  if (!student) {
+    document.getElementById('logged-out-state').style.display = 'block';
+    return;
+  }
+
+  document.getElementById('dashboard-state').style.display = 'block';
+  document.getElementById('header-cta').textContent = 'Dashboard';
+  document.getElementById('header-cta').href = 'student-dashboard.html';
+
+  var initials = student.full_name.split(' ').map(function (n) { return n[0]; }).join('').slice(0, 2).toUpperCase();
+  document.getElementById('avatar-initials').textContent = initials;
+  document.getElementById('sidebar-name').textContent = student.full_name;
+  document.getElementById('sidebar-dept').textContent = student.department || 'No department set';
+  document.getElementById('welcome-heading').textContent = 'Welcome back, ' + student.full_name.split(' ')[0] + '.';
+
+  document.getElementById('logout-btn').addEventListener('click', function () {
+    Auth.clear();
+    window.location.href = 'index.html';
+  });
+
+  var navButtons = document.querySelectorAll('.dash-nav button[data-section]');
+  navButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      navButtons.forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('.dash-section').forEach(function (s) { s.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.section).classList.add('active');
+    });
+  });
+
+  function pill(status) {
+    return '<span class="pill pill-' + status + '">' + status + '</span>';
+  }
+
+  function emptyState(text, glyph) {
+    return '<div class="dash-empty"><span class="empty-glyph">' + (glyph || '○') + '</span>' + text + '</div>';
+  }
+
+  function fmtDate(d) {
+    if (!d) return '—';
+    var date = new Date(d);
+    if (isNaN(date)) return d;
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  try {
+    var data = await Api.getDashboard(student.student_id);
+
+    document.getElementById('stat-active').textContent = data.stats.activeInternships;
+    document.getElementById('stat-attendance').textContent = data.stats.attendanceRate + '%';
+    document.getElementById('stat-tasks-done').textContent = data.stats.tasksCompleted;
+    document.getElementById('stat-certs').textContent = data.stats.certificatesEarned;
+
+    var current = data.internships.find(function (i) { return i.status === 'ongoing'; }) || data.internships[0];
+    var overviewInternshipEl = document.getElementById('overview-internship');
+    if (current) {
+      overviewInternshipEl.innerHTML =
+        '<div class="card">' +
+          '<h3>' + current.role_title + '</h3>' +
+          '<p>' + current.company_name + (current.mentor_name ? ' &middot; Mentor: ' + current.mentor_name : '') + '</p>' +
+          '<div class="tag-row">' +
+            '<span class="tag">Started ' + fmtDate(current.start_date) + '</span>' +
+            pill(current.status) +
+          '</div>' +
+        '</div>';
+    } else {
+      overviewInternshipEl.innerHTML = emptyState('No internship assigned yet. Apply to get started.', '◇');
+    }
+
+    var upcoming = data.tasks.filter(function (t) { return t.status === 'pending' || t.status === 'submitted'; }).slice(0, 4);
+    var overviewTasksEl = document.getElementById('overview-tasks');
+    if (upcoming.length) {
+      overviewTasksEl.innerHTML = '<div class="dash-table-wrap"><table class="dash-table"><thead><tr><th>Task</th><th>Due Date</th><th>Status</th></tr></thead><tbody>' +
+        upcoming.map(function (t) {
+          return '<tr><td>' + t.task_title + '</td><td>' + fmtDate(t.due_date) + '</td><td>' + pill(t.status) + '</td></tr>';
+        }).join('') + '</tbody></table></div>';
+    } else {
+      overviewTasksEl.innerHTML = emptyState('No pending tasks right now.', '✓');
+    }
+
+    var internshipsBody = document.getElementById('internships-tbody');
+    internshipsBody.innerHTML = data.internships.length ? data.internships.map(function (i) {
+      return '<tr><td>' + i.company_name + '</td><td>' + i.role_title + '</td><td>' + (i.mentor_name || '—') + '</td><td>' + fmtDate(i.start_date) + '</td><td>' + pill(i.status) + '</td></tr>';
+    }).join('') : '<tr><td colspan="5">' + emptyState('No internships on record yet.', '◇') + '</td></tr>';
+
+    var attendanceBody = document.getElementById('attendance-tbody');
+    attendanceBody.innerHTML = data.attendance.length ? data.attendance.map(function (a) {
+      return '<tr><td>' + fmtDate(a.attendance_date) + '</td><td>' + (a.check_in_time || '—') + '</td><td>' + (a.check_out_time || '—') + '</td><td>' + pill(a.status) + '</td></tr>';
+    }).join('') : '<tr><td colspan="4">' + emptyState('No attendance records yet.', '▦') + '</td></tr>';
+
+    var tasksBody = document.getElementById('tasks-tbody');
+    tasksBody.innerHTML = data.tasks.length ? data.tasks.map(function (t) {
+      return '<tr><td>' + t.task_title + '</td><td>' + fmtDate(t.due_date) + '</td><td>' + pill(t.status) + '</td></tr>';
+    }).join('') : '<tr><td colspan="3">' + emptyState('No tasks assigned yet.', '✓') + '</td></tr>';
+
+    var certsEl = document.getElementById('certificates-list');
+    certsEl.innerHTML = data.certificates.length ? data.certificates.map(function (c) {
+      return '<div class="cert-card">' +
+        '<div class="cert-num">Certificate No. ' + c.certificate_number + '</div>' +
+        '<h3>' + (c.company_name || 'Internship') + ' &mdash; ' + (c.role_title || '') + '</h3>' +
+        '<p>Issued ' + fmtDate(c.issue_date) + '</p>' +
+        (c.final_grade ? '<div class="cert-grade">' + c.final_grade + '%</div>' : '') +
+      '</div>';
+    }).join('') : emptyState('No certificates issued yet. Complete an internship to earn one.', '◈');
+
+    document.getElementById('dash-loading').style.display = 'none';
+    document.getElementById('dash-content').style.display = 'block';
+  } catch (err) {
+    document.getElementById('dash-loading').innerHTML =
+      '<div class="dash-empty"><span class="empty-glyph">!</span>Could not load your dashboard. ' + err.message + '</div>';
+  }
+});
+</script>
+</body>
+</html>

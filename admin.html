@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel | LEE Tech Leap Solutions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+:root{--blue:#1A56DB;--blue-d:#1447B8;--green:#16A34A;--ink:#111827;--ink2:#374151;--slate:#6B7280;--muted:#9CA3AF;--line:#E5E7EB;--surface:#F9FAFB;--white:#FFFFFF;--r:10px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--surface);color:var(--ink);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,h4{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;line-height:1.2;color:var(--ink)}
+
+/* Layout */
+.admin-shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.sidebar{background:var(--ink);color:var(--white);display:flex;flex-direction:column;padding:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sidebar-logo .brand{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:.95rem;color:var(--white)}
+.sidebar-logo small{display:block;font-size:.65rem;color:rgba(255,255,255,.4);margin-top:2px;letter-spacing:.06em;text-transform:uppercase}
+.nav-group{padding:18px 10px 8px}
+.nav-group-label{font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.35);padding:0 10px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:8px;font-size:.82rem;font-weight:600;color:rgba(255,255,255,.6);cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:rgba(255,255,255,.08);color:var(--white)}
+.nav-item.active{background:#1A56DB;color:var(--white)}
+.nav-icon{width:16px;height:16px;flex-shrink:0;opacity:.7}
+.nav-item.active .nav-icon{opacity:1}
+.sidebar-footer{margin-top:auto;padding:14px 10px;border-top:1px solid rgba(255,255,255,.1)}
+
+/* Main content */
+.main{display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:var(--white);border-bottom:1px solid var(--line);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.topbar-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.1rem;font-weight:700;color:var(--ink)}
+.topbar-actions{display:flex;align-items:center;gap:10px}
+.content{padding:28px;flex:1}
+
+/* Login screen */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#EFF6FF,#F0FDF4)}
+.login-card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:36px;width:380px;box-shadow:0 8px 32px rgba(26,86,219,.1)}
+.login-card h2{margin-bottom:4px;font-size:1.4rem}
+.login-card p{color:var(--slate);font-size:.87rem;margin-bottom:26px}
+.login-badge{display:inline-flex;align-items:center;gap:6px;background:#EFF6FF;color:#1A56DB;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 12px;border-radius:100px;margin-bottom:18px}
+.login-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#1A56DB}
+
+/* Sections */
+.section{display:none}
+.section.active{display:block}
+
+/* Stats grid */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+@media(max-width:900px){.stats-grid{grid-template-columns:1fr 1fr}}
+.stat-card{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:18px}
+.stat-card .num{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.8rem;font-weight:800;color:var(--blue);line-height:1}
+.stat-card .lbl{font-size:.75rem;color:var(--slate);margin-top:5px}
+.stat-card .change{font-size:.72rem;font-weight:600;margin-top:8px;display:flex;align-items:center;gap:4px}
+.change.up{color:#16A34A} .change.neutral{color:var(--slate)}
+
+/* Cards */
+.panel{background:var(--white);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line)}
+.panel-head h3{font-size:.95rem;font-family:'Plus Jakarta Sans',sans-serif}
+.panel-body{padding:0}
+
+/* Table */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.84rem}
+th{text-align:left;background:var(--surface);font-family:'Plus Jakarta Sans',sans-serif;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);padding:10px 16px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 16px;border-bottom:1px solid var(--line);vertical-align:middle;color:var(--ink2)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface)}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:.65rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:100px}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%}
+.badge-green{background:#F0FDF4;color:#15803D}.badge-green::before{background:#22C55E}
+.badge-blue{background:#EFF6FF;color:#1A56DB}.badge-blue::before{background:#1A56DB}
+.badge-yellow{background:#FEFCE8;color:#854D0E}.badge-yellow::before{background:#EAB308}
+.badge-red{background:#FEF2F2;color:#991B1B}.badge-red::before{background:#EF4444}
+.badge-gray{background:var(--surface);color:var(--slate)}.badge-gray::before{background:var(--muted)}
+.priority-high{background:#FEF2F2;color:#991B1B;padding:3px 9px;border-radius:100px;font-size:.65rem;font-weight:700;text-transform:uppercase}
+.priority-medium{background:#FEFCE8;color:#854D0E;padding:3px 9px;border-radius:100px;font-size:.65rem;font-weight:700;text-transform:uppercase}
+.priority-low{background:#F0FDF4;color:#15803D;padding:3px 9px;border-radius:100px;font-size:.65rem;font-weight:700;text-transform:uppercase}
+
+/* Avatar */
+.av{width:32px;height:32px;border-radius:50%;background:#EFF6FF;color:#1A56DB;display:inline-flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:.72rem;flex-shrink:0}
+.av-green{background:#F0FDF4;color:#15803D}
+.cell-person{display:flex;align-items:center;gap:10px}
+.cell-person .info .name{font-weight:600;font-size:.85rem;color:var(--ink)}
+.cell-person .info .sub{font-size:.74rem;color:var(--slate)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.82rem;padding:9px 16px;border-radius:8px;border:1.5px solid transparent;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn-primary:hover{background:var(--blue-d)}
+.btn-outline{background:transparent;color:var(--blue);border-color:var(--blue)}
+.btn-outline:hover{background:#EFF6FF}
+.btn-sm{padding:6px 12px;font-size:.75rem}
+.btn-danger{background:#FEF2F2;color:#991B1B;border-color:#FECACA}
+.btn-danger:hover{background:#fee2e2}
+.btn-ghost{background:var(--surface);color:var(--ink2);border-color:var(--line)}
+.btn-ghost:hover{background:var(--line)}
+
+/* Forms */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr}}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group label{font-size:.73rem;font-weight:600;color:var(--slate);text-transform:uppercase;letter-spacing:.04em}
+.form-group input,.form-group select,.form-group textarea{padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-family:'Inter',sans-serif;font-size:.88rem;color:var(--ink);background:var(--white);transition:border-color .15s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.08)}
+.form-group select{cursor:pointer}
+.form-full{grid-column:1/-1}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-radius:14px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal-head{padding:20px 24px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.modal-head h3{font-size:1rem;font-family:'Plus Jakarta Sans',sans-serif}
+.modal-close{background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--slate);line-height:1;padding:4px}
+.modal-body{padding:22px 24px}
+.modal-footer{padding:14px 24px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end}
+
+/* Alerts */
+.alert{padding:10px 14px;border-radius:8px;font-size:.84rem;margin-bottom:14px}
+.alert-error{background:#FEF2F2;color:#991B1B;border:1px solid #FECACA}
+.alert-success{background:#F0FDF4;color:#15803D;border:1px solid #BBF7D0}
+
+/* Tabs */
+.tab-row{display:flex;gap:2px;border-bottom:2px solid var(--line);margin-bottom:22px}
+.tab-btn{padding:9px 16px;background:none;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.82rem;color:var(--slate);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;border-radius:6px 6px 0 0;transition:all .15s}
+.tab-btn:hover{color:var(--blue);background:var(--surface)}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);background:#EFF6FF}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* Search bar */
+.search-bar{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.search-bar input{flex:1;padding:9px 14px;border:1px solid var(--line);border-radius:8px;font-size:.87rem;font-family:'Inter',sans-serif}
+.search-bar input:focus{outline:none;border-color:var(--blue)}
+
+/* Empty */
+.empty-state{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty-state .glyph{font-size:2rem;display:block;margin-bottom:10px}
+.empty-state p{font-size:.88rem}
+
+/* Action row */
+.action-cell{display:flex;gap:6px}
+
+/* Loading */
+.spinner{width:18px;height:18px;border:2.5px solid var(--line);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Topbar user badge */
+.user-badge{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-size:.82rem;font-weight:600}
+
+/* Filter row */
+.filter-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.filter-row select{padding:8px 12px;border:1px solid var(--line);border-radius:8px;font-size:.83rem;font-family:'Inter',sans-serif;background:var(--white);cursor:pointer}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-card">
+    <span class="login-badge">Admin Access</span>
+    <h2>LEE Tech Leap</h2>
+    <p>Sign in to manage staff and students.</p>
+    <div id="login-error" class="alert alert-error" style="display:none"></div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="admin@leetechleap.com">
+    </div>
+    <div class="form-group" style="margin-bottom:20px">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="••••••••">
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="adminLogin()">Sign In</button>
+    <p style="margin-top:14px;font-size:.78rem;color:var(--muted);text-align:center">Demo: Use any staff account or register one via <code>/api/staff/register</code></p>
+  </div>
+</div>
+
+<!-- ADMIN SHELL -->
+<div id="admin-shell" class="admin-shell" style="display:none">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="brand">LEE Tech Leap</div>
+      <small>Admin Panel</small>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Overview</div>
+      <button class="nav-item active" onclick="showSection('dashboard')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+        Dashboard
+      </button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Staff</div>
+      <button class="nav-item" onclick="showSection('staff-list')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6"/></svg>
+        All Staff
+      </button>
+      <button class="nav-item" onclick="showSection('staff-attendance')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8l2 2 4-4"/></svg>
+        Attendance
+      </button>
+      <button class="nav-item" onclick="showSection('staff-tasks')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h10M3 8h7M3 12h5"/></svg>
+        Tasks
+      </button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Students</div>
+      <button class="nav-item" onclick="showSection('student-list')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2L2 5l6 3 6-3-6-3z"/><path d="M2 9l6 3 6-3M2 12l6 3 6-3"/></svg>
+        All Students
+      </button>
+      <button class="nav-item" onclick="showSection('student-internships')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M5 3V2h6v1"/></svg>
+        Internships
+      </button>
+      <button class="nav-item" onclick="showSection('student-certs')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M5.5 8l2 2 3-3"/></svg>
+        Certificates
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="nav-item" onclick="adminLogout()" style="color:rgba(255,100,100,.7)">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 8h7M10 5l3 3-3 3"/><path d="M9 3H3a1 1 0 00-1 1v8a1 1 0 001 1h6"/></svg>
+        Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <span class="topbar-title" id="section-title">Dashboard</span>
+      <div class="topbar-actions">
+        <div class="user-badge">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6"/></svg>
+          <span id="admin-name">Admin</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div id="section-dashboard" class="section active">
+        <div class="stats-grid" id="dash-stats">
+          <div class="stat-card"><div class="num" id="ds-staff">—</div><div class="lbl">Total staff</div></div>
+          <div class="stat-card"><div class="num" id="ds-students">—</div><div class="lbl">Total students</div></div>
+          <div class="stat-card"><div class="num" id="ds-internships">—</div><div class="lbl">Active internships</div></div>
+          <div class="stat-card"><div class="num" id="ds-certs">—</div><div class="lbl">Certificates issued</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div class="panel">
+            <div class="panel-head"><h3>Recent staff</h3><button class="btn btn-sm btn-outline" onclick="showSection('staff-list')">View all</button></div>
+            <div class="panel-body tbl-wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Status</th></tr></thead><tbody id="dash-staff-tbl"><tr><td colspan="3" class="empty-state"><span class="glyph">👥</span><p>Loading...</p></td></tr></tbody></table></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>Recent students</h3><button class="btn btn-sm btn-outline" onclick="showSection('student-list')">View all</button></div>
+            <div class="panel-body tbl-wrap"><table><thead><tr><th>Name</th><th>Department</th><th>Joined</th></tr></thead><tbody id="dash-student-tbl"><tr><td colspan="3" class="empty-state"><span class="glyph">🎓</span><p>Loading...</p></td></tr></tbody></table></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAFF LIST -->
+      <div id="section-staff-list" class="section">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <div>
+            <h2 style="font-size:1.3rem">Staff members</h2>
+            <p style="font-size:.84rem;color:var(--slate);margin-top:3px">Manage your team</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modal-add-staff')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v12M2 8h12"/></svg> Add staff</button>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="staff-search" placeholder="Search by name or email..." oninput="filterStaff()">
+          <select id="staff-status-filter" onchange="filterStaff()"><option value="">All statuses</option><option value="active">Active</option><option value="inactive">Inactive</option><option value="on_leave">On leave</option></select>
+        </div>
+        <div class="panel">
+          <div class="panel-body tbl-wrap">
+            <table><thead><tr><th>Name</th><th>Role</th><th>Department</th><th>Phone</th><th>Status</th><th>Joined</th><th></th></tr></thead>
+            <tbody id="staff-table-body"></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAFF ATTENDANCE -->
+      <div id="section-staff-attendance" class="section">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <div><h2 style="font-size:1.3rem">Staff attendance</h2><p style="font-size:.84rem;color:var(--slate);margin-top:3px">Track daily check-ins</p></div>
+          <button class="btn btn-primary" onclick="openModal('modal-add-staff-att')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v12M2 8h12"/></svg> Log attendance</button>
+        </div>
+        <div class="filter-row">
+          <select id="staff-att-filter" onchange="loadStaffAttendance()"><option value="">All staff</option></select>
+          <input type="date" id="staff-att-date" onchange="loadStaffAttendance()" style="padding:8px 12px;border:1px solid var(--line);border-radius:8px;font-size:.83rem">
+        </div>
+        <div class="panel">
+          <div class="panel-body tbl-wrap">
+            <table><thead><tr><th>Staff member</th><th>Date</th><th>Check in</th><th>Check out</th><th>Status</th><th></th></tr></thead>
+            <tbody id="staff-att-body"></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAFF TASKS -->
+      <div id="section-staff-tasks" class="section">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <div><h2 style="font-size:1.3rem">Staff tasks</h2><p style="font-size:.84rem;color:var(--slate);margin-top:3px">Assign and track work</p></div>
+          <button class="btn btn-primary" onclick="openModal('modal-add-staff-task')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v12M2 8h12"/></svg> Assign task</button>
+        </div>
+        <div class="filter-row">
+          <select id="staff-task-filter" onchange="loadStaffTasks()"><option value="">All staff</option></select>
+          <select id="staff-task-status" onchange="loadStaffTasks()"><option value="">All statuses</option><option value="pending">Pending</option><option value="in_progress">In progress</option><option value="completed">Completed</option></select>
+        </div>
+        <div class="panel">
+          <div class="panel-body tbl-wrap">
+            <table><thead><tr><th>Task</th><th>Assigned to</th><th>Due date</th><th>Priority</th><th>Status</th><th></th></tr></thead>
+            <tbody id="staff-task-body"></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- STUDENT LIST -->
+      <div id="section-student-list" class="section">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <div><h2 style="font-size:1.3rem">Students</h2><p style="font-size:.84rem;color:var(--slate);margin-top:3px">Internship participants</p></div>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="student-search" placeholder="Search by name or email..." oninput="filterStudents()">
+        </div>
+        <div class="panel">
+          <div class="panel-body tbl-wrap">
+            <table><thead><tr><th>Name</th><th>Email</th><th>Department</th><th>Year</th><th>Phone</th><th>Joined</th></tr></thead>
+            <tbody id="student-table-body"></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- STUDENT INTERNSHIPS -->
+      <div id="section-student-internships" class="section">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <div><h2 style="font-size:1.3rem">Internships</h2><p style="font-size:.84rem;color:var(--slate);margin-top:3px">All student placements</p></div>
+          <button class="btn btn-primary" onclick="openModal('modal-add-internship')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v12M2 8h12"/></svg> Add internship</button>
+        </div>
+        <div class="filter-row">
+          <select id="intern-status-filter" onchange="loadInternships()"><option value="">All statuses</option><option value="ongoing">Ongoing</option><option value="completed">Completed</option><option value="terminated">Terminated</option></select>
+        </div>
+        <div class="panel">
+          <div class="panel-body tbl-wrap">
+            <table><thead><tr><th>Student</th><th>Company</th><th>Role</th><th>Mentor</th><th>Start</th><th>End</th><th>Status</th><th></th></tr></thead>
+            <tbody id="intern-table-body"></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CERTIFICATES -->
+      <div id="section-student-certs" class="section">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <div><h2 style="font-size:1.3rem">Certificates</h2><p style="font-size:.84rem;color:var(--slate);margin-top:3px">Issued completion certificates</p></div>
+          <button class="btn btn-primary" onclick="openModal('modal-add-cert')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v12M2 8h12"/></svg> Issue certificate</button>
+        </div>
+        <div class="panel">
+          <div class="panel-body tbl-wrap">
+            <table><thead><tr><th>Student</th><th>Company</th><th>Role</th><th>Cert number</th><th>Grade</th><th>Issue date</th></tr></thead>
+            <tbody id="cert-table-body"></tbody></table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /admin-shell -->
+
+<!-- ===== MODALS ===== -->
+
+<!-- Add Staff -->
+<div class="modal-overlay" id="modal-add-staff">
+  <div class="modal">
+    <div class="modal-head"><h3>Add staff member</h3><button class="modal-close" onclick="closeModal('modal-add-staff')">×</button></div>
+    <div class="modal-body">
+      <div id="staff-form-error" class="alert alert-error" style="display:none"></div>
+      <div class="form-grid">
+        <div class="form-group"><label>Full name*</label><input type="text" id="sf-name" placeholder="Jane Doe"></div>
+        <div class="form-group"><label>Email*</label><input type="email" id="sf-email" placeholder="jane@example.com"></div>
+        <div class="form-group"><label>Phone</label><input type="tel" id="sf-phone" placeholder="+91 99999 00000"></div>
+        <div class="form-group"><label>Role</label><select id="sf-role"><option value="staff">Staff</option><option value="manager">Manager</option><option value="admin">Admin</option><option value="intern">Intern</option></select></div>
+        <div class="form-group"><label>Department</label><input type="text" id="sf-dept" placeholder="Digital Marketing"></div>
+        <div class="form-group"><label>Join date</label><input type="date" id="sf-join"></div>
+        <div class="form-group"><label>Password*</label><input type="password" id="sf-pass" placeholder="••••••••"></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-add-staff')">Cancel</button><button class="btn btn-primary" onclick="addStaff()">Add staff member</button></div>
+  </div>
+</div>
+
+<!-- Edit Staff -->
+<div class="modal-overlay" id="modal-edit-staff">
+  <div class="modal">
+    <div class="modal-head"><h3>Edit staff member</h3><button class="modal-close" onclick="closeModal('modal-edit-staff')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-staff-id">
+      <div class="form-grid">
+        <div class="form-group"><label>Full name</label><input type="text" id="esf-name"></div>
+        <div class="form-group"><label>Phone</label><input type="tel" id="esf-phone"></div>
+        <div class="form-group"><label>Role</label><select id="esf-role"><option value="staff">Staff</option><option value="manager">Manager</option><option value="admin">Admin</option><option value="intern">Intern</option></select></div>
+        <div class="form-group"><label>Department</label><input type="text" id="esf-dept"></div>
+        <div class="form-group"><label>Join date</label><input type="date" id="esf-join"></div>
+        <div class="form-group"><label>Status</label><select id="esf-status"><option value="active">Active</option><option value="inactive">Inactive</option><option value="on_leave">On leave</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-edit-staff')">Cancel</button><button class="btn btn-primary" onclick="updateStaff()">Save changes</button></div>
+  </div>
+</div>
+
+<!-- Add Staff Attendance -->
+<div class="modal-overlay" id="modal-add-staff-att">
+  <div class="modal">
+    <div class="modal-head"><h3>Log staff attendance</h3><button class="modal-close" onclick="closeModal('modal-add-staff-att')">×</button></div>
+    <div class="modal-body">
+      <div id="satt-error" class="alert alert-error" style="display:none"></div>
+      <div class="form-grid">
+        <div class="form-group form-full"><label>Staff member*</label><select id="satt-staff-id"></select></div>
+        <div class="form-group"><label>Date*</label><input type="date" id="satt-date"></div>
+        <div class="form-group"><label>Status</label><select id="satt-status"><option value="present">Present</option><option value="absent">Absent</option><option value="late">Late</option><option value="excused">Excused</option></select></div>
+        <div class="form-group"><label>Check in</label><input type="time" id="satt-in"></div>
+        <div class="form-group"><label>Check out</label><input type="time" id="satt-out"></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-add-staff-att')">Cancel</button><button class="btn btn-primary" onclick="addStaffAttendance()">Log attendance</button></div>
+  </div>
+</div>
+
+<!-- Add Staff Task -->
+<div class="modal-overlay" id="modal-add-staff-task">
+  <div class="modal">
+    <div class="modal-head"><h3>Assign task to staff</h3><button class="modal-close" onclick="closeModal('modal-add-staff-task')">×</button></div>
+    <div class="modal-body">
+      <div id="stask-error" class="alert alert-error" style="display:none"></div>
+      <div class="form-grid">
+        <div class="form-group form-full"><label>Assign to*</label><select id="stask-staff-id"></select></div>
+        <div class="form-group form-full"><label>Task title*</label><input type="text" id="stask-title" placeholder="Write Q3 report"></div>
+        <div class="form-group form-full"><label>Description</label><textarea id="stask-desc" rows="3" style="resize:vertical" placeholder="Details about the task..."></textarea></div>
+        <div class="form-group"><label>Due date</label><input type="date" id="stask-due"></div>
+        <div class="form-group"><label>Priority</label><select id="stask-priority"><option value="medium">Medium</option><option value="high">High</option><option value="low">Low</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-add-staff-task')">Cancel</button><button class="btn btn-primary" onclick="addStaffTask()">Assign task</button></div>
+  </div>
+</div>
+
+<!-- Add Internship -->
+<div class="modal-overlay" id="modal-add-internship">
+  <div class="modal">
+    <div class="modal-head"><h3>Add internship</h3><button class="modal-close" onclick="closeModal('modal-add-internship')">×</button></div>
+    <div class="modal-body">
+      <div id="intern-error" class="alert alert-error" style="display:none"></div>
+      <div class="form-grid">
+        <div class="form-group form-full"><label>Student*</label><select id="intern-student-id"></select></div>
+        <div class="form-group"><label>Company name*</label><input type="text" id="intern-company" placeholder="Acme Corp"></div>
+        <div class="form-group"><label>Role title*</label><input type="text" id="intern-role" placeholder="SEO Intern"></div>
+        <div class="form-group"><label>Mentor name</label><input type="text" id="intern-mentor"></div>
+        <div class="form-group"><label>Start date*</label><input type="date" id="intern-start"></div>
+        <div class="form-group"><label>End date</label><input type="date" id="intern-end"></div>
+        <div class="form-group"><label>Status</label><select id="intern-status-sel"><option value="ongoing">Ongoing</option><option value="completed">Completed</option><option value="terminated">Terminated</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-add-internship')">Cancel</button><button class="btn btn-primary" onclick="addInternship()">Add internship</button></div>
+  </div>
+</div>
+
+<!-- Issue Certificate -->
+<div class="modal-overlay" id="modal-add-cert">
+  <div class="modal">
+    <div class="modal-head"><h3>Issue certificate</h3><button class="modal-close" onclick="closeModal('modal-add-cert')">×</button></div>
+    <div class="modal-body">
+      <div id="cert-error" class="alert alert-error" style="display:none"></div>
+      <div class="form-grid">
+        <div class="form-group form-full"><label>Internship*</label><select id="cert-internship-id"></select></div>
+        <div class="form-group"><label>Issue date*</label><input type="date" id="cert-date"></div>
+        <div class="form-group"><label>Final grade (%)</label><input type="number" id="cert-grade" min="0" max="100" placeholder="85"></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-add-cert')">Cancel</button><button class="btn btn-primary" onclick="issueCertificate()">Issue certificate</button></div>
+  </div>
+</div>
+
+<script>
+const API = '';
+let adminUser = null;
+let allStaff = [];
+let allStudents = [];
+
+/* ---- Utils ---- */
+function api(path, method='GET', body) {
+  return fetch(API + path, {
+    method,
+    headers: {'Content-Type':'application/json'},
+    body: body ? JSON.stringify(body) : undefined
+  }).then(r => r.ok ? r.json() : r.json().then(e => { throw new Error(e.error || 'Request failed') }));
+}
+
+function initials(name) {
+  return name.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  const dt = new Date(d);
+  return dt.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+}
+
+function statusBadge(s) {
+  const map = {active:'badge-green',inactive:'badge-gray',on_leave:'badge-yellow',ongoing:'badge-blue',completed:'badge-green',terminated:'badge-red',present:'badge-green',absent:'badge-red',late:'badge-yellow',excused:'badge-gray',pending:'badge-yellow',in_progress:'badge-blue',submitted:'badge-blue',approved:'badge-green',rejected:'badge-red'};
+  return `<span class="badge ${map[s]||'badge-gray'}">${s.replace('_',' ')}</span>`;
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+function showError(elId, msg) {
+  const el = document.getElementById(elId);
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideError(elId) {
+  document.getElementById(elId).style.display = 'none';
+}
+
+/* ---- Auth ---- */
+function adminLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  hideError('login-error');
+  if (!email || !password) { showError('login-error', 'Email and password are required'); return; }
+  api('/api/staff/login', 'POST', {email, password})
+    .then(user => {
+      adminUser = user;
+      document.getElementById('admin-name').textContent = user.full_name;
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('admin-shell').style.display = 'grid';
+      loadAll();
+    })
+    .catch(err => showError('login-error', err.message));
+}
+
+function adminLogout() {
+  adminUser = null;
+  document.getElementById('admin-shell').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') adminLogin(); });
+
+/* ---- Navigation ---- */
+const sectionTitles = {dashboard:'Dashboard','staff-list':'Staff members','staff-attendance':'Staff attendance','staff-tasks':'Staff tasks','student-list':'Students','student-internships':'Internships','student-certs':'Certificates'};
+
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  document.getElementById('section-title').textContent = sectionTitles[name] || name;
+  document.querySelectorAll('.nav-item').forEach(b => {
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + name + "'")) b.classList.add('active');
+  });
+  // Lazy load
+  if (name === 'dashboard') loadDashboard();
+  if (name === 'staff-list') loadStaff();
+  if (name === 'staff-attendance') loadStaffAttendance();
+  if (name === 'staff-tasks') loadStaffTasks();
+  if (name === 'student-list') loadStudents();
+  if (name === 'student-internships') loadInternships();
+  if (name === 'student-certs') loadCerts();
+}
+
+function loadAll() {
+  loadDashboard();
+  loadStaff();
+  loadStudents();
+}
+
+/* ---- Dashboard ---- */
+async function loadDashboard() {
+  try {
+    const [staff, students, internships, certs] = await Promise.all([
+      api('/api/staff'), api('/api/students'),
+      api('/api/internships'), api('/api/certificates')
+    ]);
+    allStaff = staff; allStudents = students;
+    document.getElementById('ds-staff').textContent = staff.length;
+    document.getElementById('ds-students').textContent = students.length;
+    document.getElementById('ds-internships').textContent = internships.filter(i => i.status === 'ongoing').length;
+    document.getElementById('ds-certs').textContent = certs.length;
+    // Recent staff
+    document.getElementById('dash-staff-tbl').innerHTML = staff.slice(0,5).map(s =>
+      `<tr><td><div class="cell-person"><div class="av">${initials(s.full_name)}</div><div class="info"><div class="name">${s.full_name}</div><div class="sub">${s.email}</div></div></div></td><td>${s.role||'—'}</td><td>${statusBadge(s.status)}</td></tr>`
+    ).join('') || '<tr><td colspan="3"><div class="empty-state"><span class="glyph">👥</span><p>No staff yet</p></div></td></tr>';
+    // Recent students
+    document.getElementById('dash-student-tbl').innerHTML = students.slice(0,5).map(s =>
+      `<tr><td><div class="cell-person"><div class="av av-green">${initials(s.full_name)}</div><div class="info"><div class="name">${s.full_name}</div><div class="sub">${s.email}</div></div></div></td><td>${s.department||'—'}</td><td>${fmtDate(s.created_at)}</td></tr>`
+    ).join('') || '<tr><td colspan="3"><div class="empty-state"><span class="glyph">🎓</span><p>No students yet</p></div></td></tr>';
+  } catch(e) { console.error(e); }
+}
+
+/* ---- Staff ---- */
+function loadStaff() {
+  api('/api/staff').then(data => {
+    allStaff = data;
+    renderStaffTable(data);
+    populateStaffDropdowns();
+  });
+}
+
+function renderStaffTable(data) {
+  const tbody = document.getElementById('staff-table-body');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><span class="glyph">👥</span><p>No staff members yet. Add one above.</p></div></td></tr>'; return; }
+  tbody.innerHTML = data.map(s => `
+    <tr>
+      <td><div class="cell-person"><div class="av">${initials(s.full_name)}</div><div class="info"><div class="name">${s.full_name}</div><div class="sub">${s.email}</div></div></div></td>
+      <td><span style="font-size:.8rem;font-weight:600;color:var(--ink2)">${s.role||'—'}</span></td>
+      <td>${s.department||'—'}</td>
+      <td>${s.phone||'—'}</td>
+      <td>${statusBadge(s.status)}</td>
+      <td style="font-size:.8rem;color:var(--slate)">${fmtDate(s.join_date)}</td>
+      <td><div class="action-cell">
+        <button class="btn btn-sm btn-ghost" onclick="openEditStaff(${s.staff_id})">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteStaff(${s.staff_id})">Delete</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function filterStaff() {
+  const q = document.getElementById('staff-search').value.toLowerCase();
+  const st = document.getElementById('staff-status-filter').value;
+  const filtered = allStaff.filter(s =>
+    (!q || s.full_name.toLowerCase().includes(q) || s.email.toLowerCase().includes(q)) &&
+    (!st || s.status === st)
+  );
+  renderStaffTable(filtered);
+}
+
+function addStaff() {
+  hideError('staff-form-error');
+  const body = { full_name: document.getElementById('sf-name').value.trim(), email: document.getElementById('sf-email').value.trim(), phone: document.getElementById('sf-phone').value.trim(), role: document.getElementById('sf-role').value, department: document.getElementById('sf-dept').value.trim(), join_date: document.getElementById('sf-join').value, password: document.getElementById('sf-pass').value };
+  if (!body.full_name || !body.email || !body.password) { showError('staff-form-error', 'Name, email, and password are required'); return; }
+  api('/api/staff/register', 'POST', body)
+    .then(() => { closeModal('modal-add-staff'); loadStaff(); loadDashboard(); ['sf-name','sf-email','sf-phone','sf-dept','sf-join','sf-pass'].forEach(id => document.getElementById(id).value=''); })
+    .catch(e => showError('staff-form-error', e.message));
+}
+
+function openEditStaff(id) {
+  const s = allStaff.find(x => x.staff_id === id);
+  if (!s) return;
+  document.getElementById('edit-staff-id').value = id;
+  document.getElementById('esf-name').value = s.full_name;
+  document.getElementById('esf-phone').value = s.phone||'';
+  document.getElementById('esf-role').value = s.role||'staff';
+  document.getElementById('esf-dept').value = s.department||'';
+  document.getElementById('esf-join').value = s.join_date||'';
+  document.getElementById('esf-status').value = s.status;
+  openModal('modal-edit-staff');
+}
+
+function updateStaff() {
+  const id = document.getElementById('edit-staff-id').value;
+  const body = { full_name: document.getElementById('esf-name').value.trim(), phone: document.getElementById('esf-phone').value.trim(), role: document.getElementById('esf-role').value, department: document.getElementById('esf-dept').value.trim(), join_date: document.getElementById('esf-join').value, status: document.getElementById('esf-status').value };
+  api('/api/staff/' + id, 'PUT', body)
+    .then(() => { closeModal('modal-edit-staff'); loadStaff(); loadDashboard(); })
+    .catch(e => alert(e.message));
+}
+
+function deleteStaff(id) {
+  if (!confirm('Delete this staff member? This cannot be undone.')) return;
+  api('/api/staff/' + id, 'DELETE').then(() => { loadStaff(); loadDashboard(); }).catch(e => alert(e.message));
+}
+
+function populateStaffDropdowns() {
+  const selects = ['satt-staff-id','stask-staff-id','staff-att-filter','staff-task-filter'];
+  selects.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const isFilter = id.includes('filter');
+    el.innerHTML = (isFilter ? '<option value="">All staff</option>' : '') + allStaff.map(s => `<option value="${s.staff_id}">${s.full_name}</option>`).join('');
+  });
+}
+
+/* ---- Staff Attendance ---- */
+function loadStaffAttendance() {
+  const staffId = document.getElementById('staff-att-filter').value;
+  const date = document.getElementById('staff-att-date').value;
+  let path = '/api/staff-attendance?';
+  if (staffId) path += 'staff_id=' + staffId + '&';
+  api(path).then(data => {
+    const filtered = date ? data.filter(a => a.attendance_date === date) : data;
+    const tbody = document.getElementById('staff-att-body');
+    if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><span class="glyph">📋</span><p>No attendance records</p></div></td></tr>'; return; }
+    tbody.innerHTML = filtered.map(a => {
+      const s = allStaff.find(x => x.staff_id === a.staff_id);
+      return `<tr><td>${s ? `<div class="cell-person"><div class="av">${initials(s.full_name)}</div><div class="info"><div class="name">${s.full_name}</div></div></div>` : a.staff_id}</td><td>${fmtDate(a.attendance_date)}</td><td>${a.check_in_time||'—'}</td><td>${a.check_out_time||'—'}</td><td>${statusBadge(a.status)}</td><td><button class="btn btn-sm btn-ghost" onclick="editAttStatus(${a.sa_id}, '${a.status}')">Edit</button></td></tr>`;
+    }).join('');
+  });
+}
+
+function addStaffAttendance() {
+  hideError('satt-error');
+  const body = { staff_id: parseInt(document.getElementById('satt-staff-id').value), attendance_date: document.getElementById('satt-date').value, check_in_time: document.getElementById('satt-in').value||null, check_out_time: document.getElementById('satt-out').value||null, status: document.getElementById('satt-status').value };
+  if (!body.attendance_date) { showError('satt-error', 'Date is required'); return; }
+  api('/api/staff-attendance', 'POST', body)
+    .then(() => { closeModal('modal-add-staff-att'); loadStaffAttendance(); })
+    .catch(e => showError('satt-error', e.message));
+}
+
+function editAttStatus(id, current) {
+  const ns = prompt('New status (present/absent/late/excused):', current);
+  if (!ns) return;
+  api('/api/staff-attendance/' + id, 'PUT', {status: ns}).then(() => loadStaffAttendance()).catch(e => alert(e.message));
+}
+
+/* ---- Staff Tasks ---- */
+function loadStaffTasks() {
+  const staffId = document.getElementById('staff-task-filter').value;
+  const status = document.getElementById('staff-task-status').value;
+  let path = '/api/staff-tasks?';
+  if (staffId) path += 'staff_id=' + staffId + '&';
+  if (status) path += 'status=' + status;
+  api(path).then(data => {
+    const tbody = document.getElementById('staff-task-body');
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><span class="glyph">✅</span><p>No tasks assigned yet</p></div></td></tr>'; return; }
+    tbody.innerHTML = data.map(t => {
+      const s = allStaff.find(x => x.staff_id === t.staff_id);
+      return `<tr>
+        <td><div class="info"><div class="name" style="font-weight:600">${t.task_title}</div>${t.description ? `<div class="sub" style="font-size:.74rem;color:var(--slate);margin-top:2px">${t.description.slice(0,60)}${t.description.length>60?'…':''}</div>` : ''}</div></td>
+        <td>${s ? `<div class="cell-person"><div class="av">${initials(s.full_name)}</div><div class="info"><div class="name">${s.full_name}</div></div></div>` : '—'}</td>
+        <td style="font-size:.8rem;color:var(--slate)">${fmtDate(t.due_date)}</td>
+        <td><span class="priority-${t.priority}">${t.priority}</span></td>
+        <td>${statusBadge(t.status)}</td>
+        <td><div class="action-cell">
+          <button class="btn btn-sm btn-ghost" onclick="updateTaskStatus(${t.stask_id}, '${t.status}')">Update</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteStaffTask(${t.stask_id})">Delete</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  });
+}
+
+function addStaffTask() {
+  hideError('stask-error');
+  const body = { staff_id: parseInt(document.getElementById('stask-staff-id').value), task_title: document.getElementById('stask-title').value.trim(), description: document.getElementById('stask-desc').value.trim()||null, due_date: document.getElementById('stask-due').value||null, priority: document.getElementById('stask-priority').value, status: 'pending' };
+  if (!body.task_title) { showError('stask-error', 'Task title is required'); return; }
+  api('/api/staff-tasks', 'POST', body)
+    .then(() => { closeModal('modal-add-staff-task'); loadStaffTasks(); ['stask-title','stask-desc','stask-due'].forEach(id => document.getElementById(id).value=''); })
+    .catch(e => showError('stask-error', e.message));
+}
+
+function updateTaskStatus(id, current) {
+  const statuses = ['pending','in_progress','completed'];
+  const idx = statuses.indexOf(current);
+  const next = statuses[(idx+1) % statuses.length];
+  if (!confirm(`Change status to "${next.replace('_',' ')}"?`)) return;
+  api('/api/staff-tasks/' + id, 'PUT', {status: next}).then(() => loadStaffTasks()).catch(e => alert(e.message));
+}
+
+function deleteStaffTask(id) {
+  if (!confirm('Delete this task?')) return;
+  api('/api/staff-tasks/' + id, 'DELETE').then(() => loadStaffTasks()).catch(e => alert(e.message));
+}
+
+/* ---- Students ---- */
+function loadStudents() {
+  api('/api/students').then(data => {
+    allStudents = data;
+    renderStudentTable(data);
+    populateStudentDropdowns();
+  });
+}
+
+function renderStudentTable(data) {
+  const tbody = document.getElementById('student-table-body');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><span class="glyph">🎓</span><p>No students registered yet</p></div></td></tr>'; return; }
+  tbody.innerHTML = data.map(s => `
+    <tr>
+      <td><div class="cell-person"><div class="av av-green">${initials(s.full_name)}</div><div class="info"><div class="name">${s.full_name}</div></div></div></td>
+      <td style="font-size:.82rem;color:var(--slate)">${s.email}</td>
+      <td>${s.department||'—'}</td>
+      <td>${s.year_of_study||'—'}</td>
+      <td>${s.phone||'—'}</td>
+      <td style="font-size:.8rem;color:var(--slate)">${fmtDate(s.created_at)}</td>
+    </tr>`).join('');
+}
+
+function filterStudents() {
+  const q = document.getElementById('student-search').value.toLowerCase();
+  const filtered = allStudents.filter(s => !q || s.full_name.toLowerCase().includes(q) || s.email.toLowerCase().includes(q));
+  renderStudentTable(filtered);
+}
+
+function populateStudentDropdowns() {
+  const internSel = document.getElementById('intern-student-id');
+  if (internSel) internSel.innerHTML = allStudents.map(s => `<option value="${s.student_id}">${s.full_name} (${s.email})</option>`).join('');
+}
+
+/* ---- Internships ---- */
+function loadInternships() {
+  const status = document.getElementById('intern-status-filter').value;
+  let path = '/api/internships';
+  if (status) path += '?status=' + status;
+  api(path).then(data => {
+    const tbody = document.getElementById('intern-table-body');
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><span class="glyph">💼</span><p>No internships found</p></div></td></tr>'; return; }
+    tbody.innerHTML = data.map(i => `
+      <tr>
+        <td><div class="cell-person"><div class="av av-green">${initials(i.student_name||'?')}</div><div class="info"><div class="name">${i.student_name}</div></div></div></td>
+        <td style="font-weight:600;font-size:.84rem">${i.company_name}</td>
+        <td style="font-size:.82rem;color:var(--slate)">${i.role_title}</td>
+        <td>${i.mentor_name||'—'}</td>
+        <td style="font-size:.8rem;color:var(--slate)">${fmtDate(i.start_date)}</td>
+        <td style="font-size:.8rem;color:var(--slate)">${fmtDate(i.end_date)}</td>
+        <td>${statusBadge(i.status)}</td>
+        <td><button class="btn btn-sm btn-ghost" onclick="cycleInternStatus(${i.internship_id}, '${i.status}')">Update status</button></td>
+      </tr>`).join('');
+    // Populate cert internship dropdown
+    const certSel = document.getElementById('cert-internship-id');
+    if (certSel) certSel.innerHTML = data.map(i => `<option value="${i.internship_id}">${i.student_name} @ ${i.company_name} (${i.role_title})</option>`).join('');
+  });
+}
+
+function addInternship() {
+  hideError('intern-error');
+  const body = { student_id: parseInt(document.getElementById('intern-student-id').value), company_name: document.getElementById('intern-company').value.trim(), role_title: document.getElementById('intern-role').value.trim(), mentor_name: document.getElementById('intern-mentor').value.trim()||null, start_date: document.getElementById('intern-start').value, end_date: document.getElementById('intern-end').value||null, status: document.getElementById('intern-status-sel').value };
+  if (!body.company_name || !body.role_title || !body.start_date) { showError('intern-error', 'Company name, role, and start date are required'); return; }
+  api('/api/internships', 'POST', body)
+    .then(() => { closeModal('modal-add-internship'); loadInternships(); loadDashboard(); })
+    .catch(e => showError('intern-error', e.message));
+}
+
+function cycleInternStatus(id, current) {
+  const statuses = ['ongoing','completed','terminated'];
+  const next = statuses[(statuses.indexOf(current)+1) % statuses.length];
+  if (!confirm(`Change status to "${next}"?`)) return;
+  api('/api/internships/' + id, 'PUT', {status: next}).then(() => loadInternships()).catch(e => alert(e.message));
+}
+
+/* ---- Certificates ---- */
+function loadCerts() {
+  api('/api/certificates').then(data => {
+    const tbody = document.getElementById('cert-table-body');
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><span class="glyph">🏅</span><p>No certificates issued yet</p></div></td></tr>'; return; }
+    // Need student names
+    tbody.innerHTML = data.map(c => {
+      const s = allStudents.find(x => x.student_id === c.student_id);
+      return `<tr>
+        <td>${s ? `<div class="cell-person"><div class="av av-green">${initials(s.full_name)}</div><div class="info"><div class="name">${s.full_name}</div></div></div>` : '—'}</td>
+        <td style="font-weight:600;font-size:.84rem">${c.company_name}</td>
+        <td style="font-size:.82rem;color:var(--slate)">${c.role_title}</td>
+        <td><code style="font-size:.76rem;background:var(--surface);padding:3px 7px;border-radius:5px;border:1px solid var(--line)">${c.certificate_number}</code></td>
+        <td>${c.final_grade != null ? c.final_grade + '%' : '—'}</td>
+        <td style="font-size:.8rem;color:var(--slate)">${fmtDate(c.issue_date)}</td>
+      </tr>`;
+    }).join('');
+  });
+}
+
+function issueCertificate() {
+  hideError('cert-error');
+  const body = { internship_id: parseInt(document.getElementById('cert-internship-id').value), issue_date: document.getElementById('cert-date').value, final_grade: document.getElementById('cert-grade').value ? parseFloat(document.getElementById('cert-grade').value) : null };
+  if (!body.issue_date) { showError('cert-error', 'Issue date is required'); return; }
+  api('/api/certificates', 'POST', body)
+    .then(() => { closeModal('modal-add-cert'); loadCerts(); loadDashboard(); })
+    .catch(e => showError('cert-error', e.message));
+}
+
+/* Close modals on overlay click */
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+});
+</script>
+</body>
+</html>
